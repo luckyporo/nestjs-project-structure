@@ -21,8 +21,7 @@ beforeAll(async () => {
 });
 
 test('POST: /jwt/login', async () => {
-  const { status, body } = await request.post('/jwt/login')
-    .send({ username: 'foobar', password: 'crypto' });
+  const { status, body } = await request.post('/jwt/login').send({ username: 'foobar', password: 'crypto' });
 
   expect([200, 201]).toContain(status);
   expect(body).toHaveProperty('access_token');
@@ -31,15 +30,14 @@ test('POST: /jwt/login', async () => {
 });
 
 test('GET: /jwt/check', async () => {
-  const { body } = await request.get('/jwt/check')
-    .set('Authorization', `Bearer ${accessToken}`)
-    .expect(200);
+  const { body } = await request.get('/jwt/check').set('Authorization', `Bearer ${accessToken}`).expect(200);
 
   expect(body).toHaveProperty('username', 'foobar');
 });
 
 test('POST: /jwt/refresh', async () => {
-  const { status, body } = await request.post('/jwt/refresh')
+  const { status, body } = await request
+    .post('/jwt/refresh')
     .set('Authorization', `Bearer ${accessToken}`)
     .send({ refresh_token: refreshToken });
 

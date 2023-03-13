@@ -1,9 +1,13 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import fastifyCookie from '@fastify/cookie';
+import cors from '@fastify/cors';
+import fastifyPassport from '@fastify/passport';
+import fastifySession from '@fastify/session';
 import { Logger as NestLogger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
+import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
-import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
 
 /**
@@ -12,20 +16,15 @@ import { AppModule } from './app.module';
  * https://github.com/nestjs/nest/issues/2249#issuecomment-494734673
  */
 async function bootstrap(): Promise<string> {
-  const isProduction = (process.env.NODE_ENV === 'production');
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true,
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
 
-  if (isProduction) {
-    app.enable('trust proxy');
-  }
-
-  // Express Middleware
-  middleware(app);
+  await app.register(fastifyCookie);
+  await app.register(fastifySession, { secret: '753fed217ab14648902c03cbcb88cba2' });
+  await app.register(fastifyPassport.initialize());
+  await app.register(cors);
 
   await app.listen(process.env.PORT || 3000);
 

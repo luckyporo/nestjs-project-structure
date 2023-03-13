@@ -7,11 +7,7 @@ import { User, UserService } from '../shared/user';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwt: JwtService,
-    private user: UserService,
-    private config: ConfigService,
-  ) {}
+  constructor(private jwt: JwtService, private user: UserService, private config: ConfigService) {}
 
   public async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.user.fetch(username);
@@ -29,8 +25,8 @@ export class AuthService {
       return false;
     }
 
-    const payload = <{ sub: string }> this.jwt.decode(refreshToken);
-    return (payload.sub === data.userId);
+    const payload = <{ sub: string }>this.jwt.decode(refreshToken);
+    return payload.sub === data.userId;
   }
 
   public jwtSign(data: Payload): JwtSign {
@@ -43,9 +39,12 @@ export class AuthService {
   }
 
   private getRefreshToken(sub: string): string {
-    return this.jwt.sign({ sub }, {
-      secret: this.config.get('jwtRefreshSecret'),
-      expiresIn: '7d', // Set greater than the expiresIn of the access_token
-    });
+    return this.jwt.sign(
+      { sub },
+      {
+        secret: this.config.get('jwtRefreshSecret'),
+        expiresIn: '7d', // Set greater than the expiresIn of the access_token
+      },
+    );
   }
 }
