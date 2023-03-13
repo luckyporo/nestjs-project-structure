@@ -23,14 +23,6 @@ import { SampleModule } from './sample';
       isGlobal: true,
       load: [configuration],
     }),
-    // Database
-    // https://docs.nestjs.com/techniques/database
-    TypeOrmModule.forRootAsync({
-      useFactory: (config: ConfigService) => ({
-        ...config.get<TypeOrmModuleOptions>('db'),
-      }),
-      inject: [ConfigService],
-    }),
     // Static Folder
     // https://docs.nestjs.com/recipes/serve-static
     // https://docs.nestjs.com/techniques/mvc
