@@ -1,14 +1,13 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_PIPE, RouterModule } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
+import { PrismaModule } from 'nestjs-prisma';
 
-import { BaseModule } from './base';
 import { CommonModule, ExceptionsFilter } from './common';
 import { configuration, loggerOptions } from './config';
-import { SampleModule as DebugSampleModule } from './debug';
-import { SampleModule } from './sample';
+import { BaseModule, UserModule } from './modules';
 
 @Module({
   imports: [
@@ -21,6 +20,7 @@ import { SampleModule } from './sample';
       isGlobal: true,
       load: [configuration],
     }),
+    PrismaModule.forRoot({ isGlobal: true }),
     // Static Folder
     // https://docs.nestjs.com/recipes/serve-static
     // https://docs.nestjs.com/techniques/mvc
@@ -31,20 +31,9 @@ import { SampleModule } from './sample';
     // Service Modules
     CommonModule, // Global
     BaseModule,
-    SampleModule,
-    DebugSampleModule,
+    UserModule,
     // Module Router
     // https://docs.nestjs.com/recipes/router-module
-    RouterModule.register([
-      {
-        path: 'test',
-        module: SampleModule,
-      },
-      {
-        path: 'test',
-        module: DebugSampleModule,
-      },
-    ]),
   ],
   providers: [
     // Global Guard, Authentication check on all routers

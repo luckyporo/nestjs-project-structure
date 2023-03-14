@@ -1,5 +1,4 @@
 import { Controller, Get, Post, UseGuards, Req, Res, UnauthorizedException, Body } from '@nestjs/common';
-import type { Request, Response } from 'express';
 
 import {
   AuthService,
@@ -10,8 +9,8 @@ import {
   JwtAuthGuard,
   JwtSign,
   JwtVerifyGuard,
-} from '../../auth';
-import { ReqUser } from '../../common';
+} from '../../../auth';
+import { ReqUser } from '../../../common';
 
 /**
  * https://docs.nestjs.com/techniques/authentication
@@ -32,7 +31,7 @@ export class AuthController {
   }
 
   @Get('logout')
-  public logout(@Req() req: Request, @Res() res: Response): void {
+  public logout(@Req() req: any, @Res() res: any): void {
     req.logout(() => {
       res.redirect('/');
     });
